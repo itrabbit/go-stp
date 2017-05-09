@@ -1,2 +1,1 @@
-# go-stp
-Standard Template Package for GoLang
+# Standard Template Package for GoLang
