@@ -1,4 +1,4 @@
-package go_stp
+package array
 
 import (
 	"fmt"
@@ -6,14 +6,14 @@ import (
 )
 
 func TestArray_Len(t *testing.T) {
-	arr := NewArray(1, 2, 3)
+	arr := New(1, 2, 3)
 	if arr.Length() != 3 {
 		t.Error("Invalid array length")
 	}
 }
 
 func TestArray_At(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.At(2)
 	if err != nil {
 		t.Error(err)
@@ -24,7 +24,7 @@ func TestArray_At(t *testing.T) {
 }
 
 func TestArray_First(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.First()
 	if err != nil {
 		t.Error(err)
@@ -35,7 +35,7 @@ func TestArray_First(t *testing.T) {
 }
 
 func TestArray_Last(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.Last()
 	if err != nil {
 		t.Error(err)
@@ -46,7 +46,7 @@ func TestArray_Last(t *testing.T) {
 }
 
 func TestArray_Push(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.Push(6).Last()
 	if err != nil {
 		t.Error(err)
@@ -60,7 +60,7 @@ func TestArray_Push(t *testing.T) {
 }
 
 func TestArray_Pop(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.Pop()
 	if err != nil {
 		t.Error(err)
@@ -81,7 +81,7 @@ func TestArray_Pop(t *testing.T) {
 }
 
 func TestArray_Shift(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.Shift()
 	if err != nil {
 		t.Error(err)
@@ -102,7 +102,7 @@ func TestArray_Shift(t *testing.T) {
 }
 
 func TestArray_Insert(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	item, err := arr.Insert(2, 10).At(2)
 	if err != nil {
 		t.Error(err)
@@ -116,14 +116,14 @@ func TestArray_Insert(t *testing.T) {
 }
 
 func TestArray_Remove(t *testing.T) {
-	arr := NewArray(1, 2, 3, 4, 5)
+	arr := New(1, 2, 3, 4, 5)
 	if arr.Remove(2).Length() != 4 {
 		t.Error("Invalid array length")
 	}
 }
 
 func TestArray_Sort(t *testing.T) {
-	arr := NewArray(5, 2, 3, 4, 1)
+	arr := New(5, 2, 3, 4, 1)
 	if fmt.Sprint(arr.Sort(func(a, b interface{}) bool {
 		return a.(int) > b.(int)
 	}).Data()) != "[5 4 3 2 1]" {
