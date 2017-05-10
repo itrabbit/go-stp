@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Get Float reflect Type
 func Type(bitSize int) reflect.Type {
 	switch bitSize {
 	case 32:
@@ -19,13 +20,13 @@ func Type(bitSize int) reflect.Type {
 	}
 }
 
-// Convert To Float32
-func To32(obj interface{}) (float32, error) {
+// Convert To Float
+func To(obj interface{}, bitSize int) (float64, error) {
 	t := reflect.TypeOf(obj)
-	if t == Type(32) {
-		return obj.(float32), nil
+	if t == Type(bitSize) {
+		return reflect.ValueOf(obj).Float(), nil
 	}
-	m, err := conversion.GetMethod(t, Type(32))
+	m, err := conversion.GetMethod(t, Type(bitSize))
 	if err != nil {
 		return 0, err
 	}
@@ -33,52 +34,16 @@ func To32(obj interface{}) (float32, error) {
 	if err != nil {
 		return 0, err
 	}
-	return res.(float32), nil
+	return reflect.ValueOf(res).Float(), nil
 }
 
-// Convert To Float32 By Default Value
-func ToDef32(obj interface{}, def float32) float32 {
-	res, err := To32(obj)
+// Convert To Float By Default Value
+func ToDef(obj interface{}, bitSize int, def float64) float64 {
+	res, err := To(obj, bitSize)
 	if err != nil {
 		return def
 	}
 	return res
-}
-
-// Convert To Float64
-func To64(obj interface{}) (float64, error) {
-	t := reflect.TypeOf(obj)
-	if t == Type(64) {
-		return obj.(float64), nil
-	}
-	m, err := conversion.GetMethod(t, Type(64))
-	if err != nil {
-		return 0, err
-	}
-	res, err := m(obj)
-	if err != nil {
-		return 0, err
-	}
-	return res.(float64), nil
-}
-
-// Convert To Float64 By Default Value
-func ToDef64(obj interface{}, def float64) float64 {
-	res, err := To64(obj)
-	if err != nil {
-		return def
-	}
-	return res
-}
-
-// Convert To Float64
-func To(obj interface{}) (float64, error) {
-	return To64(obj)
-}
-
-// Convert To Float64 By Default Value
-func ToDef(obj interface{}, def float64) float64 {
-	return ToDef64(obj, def)
 }
 
 func init() {
@@ -89,6 +54,7 @@ func init() {
 		}
 		return nil, errors.New("Conversion object is not float32")
 	})
+
 	// Float 64 To Float 32
 	conversion.SetMethod(Type(64), Type(32), func(obj interface{}) (interface{}, error) {
 		if f, ok := obj.(float64); ok {
@@ -96,146 +62,51 @@ func init() {
 		}
 		return nil, errors.New("Conversion object is not float64")
 	})
-	// Int 8 To Float 32
-	conversion.SetMethod(reflect.TypeOf(int8(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int8); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not int8")
+
+	// Signed Integers to Float 32
+	conversion.SetMultiMethod([]reflect.Type{
+		reflect.TypeOf(int(0)),
+		reflect.TypeOf(int8(0)),
+		reflect.TypeOf(int16(0)),
+		reflect.TypeOf(int32(0)),
+		reflect.TypeOf(int64(0)),
+	}, Type(32), func(obj interface{}) (interface{}, error) {
+		return float32(reflect.ValueOf(obj).Int()), nil
 	})
-	// Int 8 To Float 64
-	conversion.SetMethod(reflect.TypeOf(int8(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int8); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not int8")
+
+	// Unsigned Integers to Float 32
+	conversion.SetMultiMethod([]reflect.Type{
+		reflect.TypeOf(uint(0)),
+		reflect.TypeOf(uint8(0)),
+		reflect.TypeOf(uint16(0)),
+		reflect.TypeOf(uint32(0)),
+		reflect.TypeOf(uint64(0)),
+	}, Type(32), func(obj interface{}) (interface{}, error) {
+		return float32(reflect.ValueOf(obj).Uint()), nil
 	})
-	// Int 16 To Float 32
-	conversion.SetMethod(reflect.TypeOf(int16(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int16); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not int16")
+
+	// Signed Integers to Float 64
+	conversion.SetMultiMethod([]reflect.Type{
+		reflect.TypeOf(int(0)),
+		reflect.TypeOf(int8(0)),
+		reflect.TypeOf(int16(0)),
+		reflect.TypeOf(int32(0)),
+		reflect.TypeOf(int64(0)),
+	}, Type(64), func(obj interface{}) (interface{}, error) {
+		return float64(reflect.ValueOf(obj).Int()), nil
 	})
-	// Int 16 To Float 64
-	conversion.SetMethod(reflect.TypeOf(int16(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int16); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not int16")
+
+	// Unsigned Integers to Float 64
+	conversion.SetMultiMethod([]reflect.Type{
+		reflect.TypeOf(uint(0)),
+		reflect.TypeOf(uint8(0)),
+		reflect.TypeOf(uint16(0)),
+		reflect.TypeOf(uint32(0)),
+		reflect.TypeOf(uint64(0)),
+	}, Type(64), func(obj interface{}) (interface{}, error) {
+		return float64(reflect.ValueOf(obj).Uint()), nil
 	})
-	// Int 32 To Float 32
-	conversion.SetMethod(reflect.TypeOf(int32(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int32); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not int32")
-	})
-	// Int 32 To Float 64
-	conversion.SetMethod(reflect.TypeOf(int32(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int32); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not int32")
-	})
-	// Int To Float 32
-	conversion.SetMethod(reflect.TypeOf(int(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not int")
-	})
-	// Int To Float 64
-	conversion.SetMethod(reflect.TypeOf(int(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not int")
-	})
-	// Int 64 To Float 32
-	conversion.SetMethod(reflect.TypeOf(int64(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int64); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not int64")
-	})
-	// Int 64 To Float 64
-	conversion.SetMethod(reflect.TypeOf(int64(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(int64); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not int64")
-	})
-	// UInt 8 To Float 32
-	conversion.SetMethod(reflect.TypeOf(uint8(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint8); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint8")
-	})
-	// UInt 8 To Float 64
-	conversion.SetMethod(reflect.TypeOf(uint8(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint8); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint8")
-	})
-	// UInt 16 To Float 32
-	conversion.SetMethod(reflect.TypeOf(uint16(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint16); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint16")
-	})
-	// UInt 16 To Float 64
-	conversion.SetMethod(reflect.TypeOf(uint16(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint16); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint16")
-	})
-	// UInt 32 To Float 32
-	conversion.SetMethod(reflect.TypeOf(uint32(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint32); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint32")
-	})
-	// UInt 32 To Float 64
-	conversion.SetMethod(reflect.TypeOf(uint32(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint32); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint32")
-	})
-	// UInt To Float 32
-	conversion.SetMethod(reflect.TypeOf(uint(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint")
-	})
-	// UInt To Float 64
-	conversion.SetMethod(reflect.TypeOf(uint(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint")
-	})
-	// UInt 64 To Float 32
-	conversion.SetMethod(reflect.TypeOf(uint64(0)), Type(32), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint64); ok {
-			return float32(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint64")
-	})
-	// UInt 64 To Float 64
-	conversion.SetMethod(reflect.TypeOf(uint64(0)), Type(64), func(obj interface{}) (interface{}, error) {
-		if i, ok := obj.(uint64); ok {
-			return float64(i), nil
-		}
-		return nil, errors.New("Conversion object is not uint64")
-	})
+
 	// String To Float 32
 	conversion.SetMethod(reflect.TypeOf(string("")), Type(32), func(obj interface{}) (interface{}, error) {
 		if s, ok := obj.(string); ok {
@@ -247,6 +118,7 @@ func init() {
 		}
 		return nil, errors.New("Conversion object is not string")
 	})
+
 	// String To Float 64
 	conversion.SetMethod(reflect.TypeOf(string("")), Type(64), func(obj interface{}) (interface{}, error) {
 		if s, ok := obj.(string); ok {
@@ -254,6 +126,29 @@ func init() {
 		}
 		return nil, errors.New("Conversion object is not string")
 	})
+
+	// Bool to Float 32
+	conversion.SetMethod(reflect.TypeOf(bool(false)), Type(32), func(obj interface{}) (interface{}, error) {
+		if b, ok := obj.(bool); ok {
+			if b {
+				return float32(1.0), nil
+			}
+			return float32(0.0), nil
+		}
+		return nil, errors.New("Conversion object is not bool")
+	})
+
+	// Bool to Float 64
+	conversion.SetMethod(reflect.TypeOf(bool(false)), Type(32), func(obj interface{}) (interface{}, error) {
+		if b, ok := obj.(bool); ok {
+			if b {
+				return float64(1.0), nil
+			}
+			return float64(0.0), nil
+		}
+		return nil, errors.New("Conversion object is not bool")
+	})
+
 	// time.Time To Float 32
 	conversion.SetMethod(reflect.TypeOf(time.Time{}), Type(32), func(obj interface{}) (interface{}, error) {
 		if t, ok := obj.(time.Time); ok {
@@ -261,6 +156,7 @@ func init() {
 		}
 		return nil, errors.New("Conversion object is not time.Time")
 	})
+
 	// time.Time To Float 64
 	conversion.SetMethod(reflect.TypeOf(time.Time{}), Type(64), func(obj interface{}) (interface{}, error) {
 		if t, ok := obj.(time.Time); ok {

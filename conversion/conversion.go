@@ -26,6 +26,21 @@ func SetMethod(from reflect.Type, to reflect.Type, m Method) {
 	cache.Unlock()
 }
 
+// Set Conversion Method
+func SetMultiMethod(from []reflect.Type, to reflect.Type, m Method) {
+	cache.Lock()
+	if cache.m == nil {
+		cache.m = make(map[reflect.Type]map[reflect.Type]Method)
+	}
+	for _, f := range from {
+		if _, ok := cache.m[f]; !ok {
+			cache.m[f] = make(map[reflect.Type]Method)
+		}
+		cache.m[f][to] = m
+	}
+	cache.Unlock()
+}
+
 // Get Conversion Method
 func GetMethod(from reflect.Type, to reflect.Type) (Method, error) {
 	var result Method
