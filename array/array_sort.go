@@ -1,6 +1,6 @@
 package array
 
-// Copy from "sort" package
+// Copy and adaptive from "sort" package
 
 func (a *Object) quickSort(less LessFunc, _a, b, maxDepth int64) *Object {
 	for b-_a > 12 {
