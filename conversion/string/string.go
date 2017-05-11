@@ -2,12 +2,10 @@ package string
 
 import (
 	"errors"
+	"github.com/itrabbit/go-stp/conversion"
 	"reflect"
 	"strconv"
-
 	"time"
-
-	"github.com/itrabbit/go-stp/conversion"
 )
 
 // Get String reflect Type
