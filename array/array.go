@@ -3,10 +3,8 @@ package array
 import (
 	"errors"
 	"github.com/itrabbit/go-stp/util"
+	"github.com/itrabbit/go-stp/util/less"
 )
-
-// Less function
-type LessFunc func(a, b interface{}) bool
 
 // Array Interface
 type Interface interface {
@@ -28,7 +26,7 @@ type Interface interface {
 	Begin() util.Iterator
 	End() util.Iterator
 	Clear() Interface
-	Sort(less LessFunc) Interface
+	Sort(less less.Func) Interface
 }
 
 // Private class array
@@ -236,7 +234,7 @@ func (a *object) End() util.Iterator {
 }
 
 // Sort Array
-func (a *object) Sort(less LessFunc) Interface {
+func (a *object) Sort(less less.Func) Interface {
 	if a.data == nil {
 		a.data = make([]interface{}, 0)
 	}

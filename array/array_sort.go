@@ -1,8 +1,12 @@
 package array
 
+import (
+	"github.com/itrabbit/go-stp/util/less"
+)
+
 // Copy and adaptive from "sort" package
 
-func (a *object) quickSort(less LessFunc, _a, b, maxDepth int64) *object {
+func (a *object) quickSort(less less.Func, _a, b, maxDepth int64) *object {
 	for b-_a > 12 {
 		if maxDepth == 0 {
 			return a.heapSort(less, _a, b)
@@ -28,7 +32,7 @@ func (a *object) quickSort(less LessFunc, _a, b, maxDepth int64) *object {
 	return a
 }
 
-func (a *object) heapSort(less LessFunc, _a, b int64) *object {
+func (a *object) heapSort(less less.Func, _a, b int64) *object {
 	first, lo, hi := _a, int64(0), b-_a
 	for i := (hi - 1) / 2; i >= 0; i-- {
 		a.siftDown(less, i, hi, first)
@@ -40,7 +44,7 @@ func (a *object) heapSort(less LessFunc, _a, b int64) *object {
 	return a
 }
 
-func (a *object) insertionSort(less LessFunc, _a, b int64) *object {
+func (a *object) insertionSort(less less.Func, _a, b int64) *object {
 	for i := _a + 1; i < b; i++ {
 		for j := i; j > _a && less(a.data[j], a.data[j-1]); j-- {
 			a.Swap(j, j-1)
@@ -49,7 +53,7 @@ func (a *object) insertionSort(less LessFunc, _a, b int64) *object {
 	return a
 }
 
-func (a *object) siftDown(less LessFunc, lo, hi, first int64) {
+func (a *object) siftDown(less less.Func, lo, hi, first int64) {
 	root := lo
 	for {
 		child := 2*root + 1
@@ -67,7 +71,7 @@ func (a *object) siftDown(less LessFunc, lo, hi, first int64) {
 	}
 }
 
-func (a *object) medianOfThree(less LessFunc, m1, m0, m2 int64) {
+func (a *object) medianOfThree(less less.Func, m1, m0, m2 int64) {
 	if less(a.data[m1], a.data[m0]) {
 		a.Swap(m1, m0)
 	}
@@ -79,7 +83,7 @@ func (a *object) medianOfThree(less LessFunc, m1, m0, m2 int64) {
 	}
 }
 
-func (a *object) doPivot(less LessFunc, lo, hi int64) (midlo, midhi int64) {
+func (a *object) doPivot(less less.Func, lo, hi int64) (midlo, midhi int64) {
 	m := lo + (hi-lo)/2
 	if hi-lo > 40 {
 		s := (hi - lo) / 8
