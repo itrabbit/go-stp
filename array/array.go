@@ -5,16 +5,44 @@ import (
 	"github.com/itrabbit/go-stp/util"
 )
 
-type Object struct {
+// Less function
+type LessFunc func(a, b interface{}) bool
+
+// Array Interface
+type Interface interface {
+	Set(pos int64, item interface{}) Interface
+	Get(pos int64) (interface{}, error)
+	GetByDef(pos int64, def interface{}) interface{}
+	First() (interface{}, error)
+	Last() (interface{}, error)
+	Push(items ...interface{}) Interface
+	Pop() (interface{}, error)
+	Shift() (interface{}, error)
+	Insert(pos int64, item interface{}) Interface
+	Remove(pos int64) Interface
+	Resize(size int64) Interface
+	Length() int64
+	Swap(i, j int64) Interface
+	ReOrder() Interface
+	Data() []interface{}
+	Begin() util.Iterator
+	End() util.Iterator
+	Clear() Interface
+	Sort(less LessFunc) Interface
+}
+
+// Private class array
+type object struct {
 	data []interface{}
 }
 
-type Iterator struct {
-	a     *Object
+// Private class array iterator
+type iterator struct {
+	a     *object
 	index int64
 }
 
-func (i *Iterator) Next() bool {
+func (i *iterator) Next() bool {
 	if i.index+1 < i.a.Length() {
 		i.index += 1
 		return true
@@ -22,20 +50,20 @@ func (i *Iterator) Next() bool {
 	return false
 }
 
-func (i *Iterator) Prev() bool {
-	if i.index-1 >= 0 {
+func (i *iterator) Prev() bool {
+	if i.index-1 >= 0 && i.a.Length() > 0 {
 		i.index -= 1
 		return true
 	}
 	return false
 }
 
-func (i *Iterator) Index() int64 {
+func (i *iterator) Index() int64 {
 	return i.index
 }
 
-func (i *Iterator) Data() interface{} {
-	d, err := i.a.At(i.index)
+func (i *iterator) Data() interface{} {
+	d, err := i.a.Get(i.index)
 	if err != nil {
 		return nil
 	}
@@ -43,23 +71,31 @@ func (i *Iterator) Data() interface{} {
 }
 
 // Set value
-func (a *Object) Set(pos int64, obj interface{}) *Object {
+func (a *object) Set(pos int64, item interface{}) Interface {
 	if pos >= 0 && pos < a.Length() {
-		a.data[pos] = obj
+		a.data[pos] = item
 	}
 	return a
 }
 
 // Get item from Array by position
-func (a *Object) At(pos int64) (interface{}, error) {
+func (a *object) Get(pos int64) (interface{}, error) {
 	if pos >= 0 && pos < a.Length() {
 		return a.data[pos], nil
 	}
 	return nil, errors.New("Outside the array")
 }
 
+// Get item from Array by position
+func (a *object) GetByDef(pos int64, def interface{}) interface{} {
+	if pos >= 0 && pos < a.Length() {
+		return a.data[pos]
+	}
+	return def
+}
+
 // Get first item from Array
-func (a *Object) First() (interface{}, error) {
+func (a *object) First() (interface{}, error) {
 	if a.Length() > 0 {
 		return a.data[0], nil
 	}
@@ -67,21 +103,24 @@ func (a *Object) First() (interface{}, error) {
 }
 
 // Get last item from Array
-func (a *Object) Last() (interface{}, error) {
+func (a *object) Last() (interface{}, error) {
 	if l := a.Length(); l-1 >= 0 {
 		return a.data[l-1], nil
 	}
 	return nil, errors.New("Array is empty")
 }
 
-// Add object to Array
-func (a *Object) Push(obj interface{}) *Object {
-	a.data = append(a.data, obj)
+// Add objects to Array
+func (a *object) Push(items ...interface{}) Interface {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
+	a.data = append(a.data, items...)
 	return a
 }
 
 // Pop item from Array
-func (a *Object) Pop() (interface{}, error) {
+func (a *object) Pop() (interface{}, error) {
 	if l := a.Length(); l-1 >= 0 {
 		var result interface{}
 		result, a.data = a.data[l-1], a.data[:l-1]
@@ -91,7 +130,7 @@ func (a *Object) Pop() (interface{}, error) {
 }
 
 // Shift item from Array
-func (a *Object) Shift() (interface{}, error) {
+func (a *object) Shift() (interface{}, error) {
 	if a.Length() > 0 {
 		var result interface{}
 		result, a.data = a.data[0], a.data[1:]
@@ -101,19 +140,22 @@ func (a *Object) Shift() (interface{}, error) {
 }
 
 // Insert object to Array by position
-func (a *Object) Insert(pos int64, obj interface{}) *Object {
+func (a *object) Insert(pos int64, item interface{}) Interface {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
 	if pos >= 0 && pos < a.Length() {
 		a.data = append(a.data, 0)
 		copy(a.data[pos+1:], a.data[pos:])
-		a.data[pos] = obj
+		a.data[pos] = item
 	} else {
-		a.data = append(a.data, obj)
+		a.data = append(a.data, item)
 	}
 	return a
 }
 
 // Remove item by position
-func (a *Object) Remove(pos int64) *Object {
+func (a *object) Remove(pos int64) Interface {
 	if pos >= 0 && pos < a.Length() {
 		copy(a.data[pos:], a.data[pos+1:])
 		a.data[len(a.data)-1] = nil
@@ -123,7 +165,10 @@ func (a *Object) Remove(pos int64) *Object {
 }
 
 // Resize array
-func (a *Object) Resize(size int64) *Object {
+func (a *object) Resize(size int64) Interface {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
 	if a.Length() > size {
 		a.data = a.data[0:size]
 	} else if a.Length() < size {
@@ -133,51 +178,68 @@ func (a *Object) Resize(size int64) *Object {
 }
 
 // Get Array length
-func (a *Object) Length() int64 {
+func (a *object) Length() int64 {
 	return int64(len(a.data))
 }
 
 // Swap items by they positions
-func (a *Object) Swap(i, j int64) *Object {
+func (a *object) Swap(i, j int64) Interface {
 	a.data[i], a.data[j] = a.data[j], a.data[i]
 	return a
 }
 
+// ReOrder Array
+func (a *object) ReOrder() Interface {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
+	firstIndex, lastIndex, steps := int64(0), a.Length()-1, a.Length()/2
+	if lastIndex > firstIndex {
+		for i := int64(0); i < steps; i++ {
+			a.Swap(firstIndex+i, lastIndex-i)
+		}
+	}
+	return a
+}
+
 // Get Raw Data
-func (a *Object) Data() []interface{} {
+func (a *object) Data() []interface{} {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
 	return a.data
 }
 
 // Clear array
-func (a *Object) Clear() *Object {
+func (a *object) Clear() Interface {
 	a.data = a.data[len(a.data):]
 	a.data = nil
 	return a
 }
 
-func (a *Object) Begin() util.Iterator {
-	return &Iterator{
+func (a *object) Begin() util.Iterator {
+	return &iterator{
 		a:     a,
 		index: 0,
 	}
 }
 
-func (a *Object) End() util.Iterator {
+func (a *object) End() util.Iterator {
 	index := a.Length() - 1
 	if index < 0 {
 		index = 0
 	}
-	return &Iterator{
+	return &iterator{
 		a:     a,
 		index: index,
 	}
 }
 
-// Less function
-type LessFunc func(a, b interface{}) bool
-
 // Sort Array
-func (a *Object) Sort(less LessFunc) *Object {
+func (a *object) Sort(less LessFunc) Interface {
+	if a.data == nil {
+		a.data = make([]interface{}, 0)
+	}
 	n := a.Length()
 	maxDepth := int64(0)
 	for i := n; i > 0; i >>= 1 {
@@ -188,11 +250,9 @@ func (a *Object) Sort(less LessFunc) *Object {
 }
 
 // Create new array
-func New(items ...interface{}) *Object {
-	a := new(Object)
-	a.data = make([]interface{}, len(items))
-	for i, item := range items {
-		a.data[i] = item
-	}
+func New(items ...interface{}) Interface {
+	a := new(object)
+	a.data = make([]interface{}, 0, len(items)+1)
+	a.data = append(a.data, items...)
 	return a
 }

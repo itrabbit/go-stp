@@ -21,7 +21,7 @@ func Type(bitSize int) reflect.Type {
 }
 
 // Convert To Float
-func To(obj interface{}, bitSize int) (float64, error) {
+func From(obj interface{}, bitSize int) (float64, error) {
 	t := reflect.TypeOf(obj)
 	if t == Type(bitSize) {
 		return reflect.ValueOf(obj).Float(), nil
@@ -38,8 +38,8 @@ func To(obj interface{}, bitSize int) (float64, error) {
 }
 
 // Convert To Float By Default Value
-func ToDef(obj interface{}, bitSize int, def float64) float64 {
-	res, err := To(obj, bitSize)
+func FromByDef(obj interface{}, bitSize int, def float64) float64 {
+	res, err := From(obj, bitSize)
 	if err != nil {
 		return def
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func TestIntToFloat(t *testing.T) {
-	res, err := To(int(2), 64)
+	res, err := From(int(2), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -18,7 +18,7 @@ func TestIntToFloat(t *testing.T) {
 }
 
 func TestInt8ToFloat(t *testing.T) {
-	res, err := To(int8(8), 64)
+	res, err := From(int8(8), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -30,7 +30,7 @@ func TestInt8ToFloat(t *testing.T) {
 }
 
 func TestInt16ToFloat(t *testing.T) {
-	res, err := To(int16(16), 64)
+	res, err := From(int16(16), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -42,7 +42,7 @@ func TestInt16ToFloat(t *testing.T) {
 }
 
 func TestInt32ToFloat(t *testing.T) {
-	res, err := To(int32(32), 64)
+	res, err := From(int32(32), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -54,7 +54,7 @@ func TestInt32ToFloat(t *testing.T) {
 }
 
 func TestInt64ToFloat(t *testing.T) {
-	res, err := To(int64(64), 64)
+	res, err := From(int64(64), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -66,7 +66,7 @@ func TestInt64ToFloat(t *testing.T) {
 }
 
 func TestUIntToFloat(t *testing.T) {
-	res, err := To(uint(2), 64)
+	res, err := From(uint(2), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -78,7 +78,7 @@ func TestUIntToFloat(t *testing.T) {
 }
 
 func TestUInt8ToFloat(t *testing.T) {
-	res, err := To(uint8(8), 64)
+	res, err := From(uint8(8), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -90,7 +90,7 @@ func TestUInt8ToFloat(t *testing.T) {
 }
 
 func TestUInt16ToFloat(t *testing.T) {
-	res, err := To(uint16(16), 64)
+	res, err := From(uint16(16), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -102,7 +102,7 @@ func TestUInt16ToFloat(t *testing.T) {
 }
 
 func TestUInt32ToFloat(t *testing.T) {
-	res, err := To(uint32(32), 64)
+	res, err := From(uint32(32), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -114,7 +114,7 @@ func TestUInt32ToFloat(t *testing.T) {
 }
 
 func TestUInt64ToFloat(t *testing.T) {
-	res, err := To(uint64(64), 64)
+	res, err := From(uint64(64), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -126,7 +126,7 @@ func TestUInt64ToFloat(t *testing.T) {
 }
 
 func TestFloat32ToFloat(t *testing.T) {
-	res, err := To(float32(32.25), 64)
+	res, err := From(float32(32.25), 64)
 	if err != nil {
 		t.Error(err)
 		return
@@ -138,7 +138,7 @@ func TestFloat32ToFloat(t *testing.T) {
 }
 
 func TestFloat64ToFloat(t *testing.T) {
-	res, err := To(float64(64.1234),32)
+	res, err := From(float64(64.1234), 32)
 	if err != nil {
 		t.Error(err)
 		return
@@ -151,11 +151,7 @@ func TestFloat64ToFloat(t *testing.T) {
 
 func TestTimeToFloat(t *testing.T) {
 	now := time.Now()
-	res, err := To(now, 64)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	res := FromByDef(now, 64, 0)
 	if res != float64(now.Unix()) {
 		t.Error(res, "!=", float64(now.Unix()))
 		return

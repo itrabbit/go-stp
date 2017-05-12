@@ -14,7 +14,7 @@ func Type() reflect.Type {
 }
 
 // Convert To String
-func To(obj interface{}) (string, error) {
+func From(obj interface{}) (string, error) {
 	t := reflect.TypeOf(obj)
 	if t == Type() {
 		return obj.(string), nil
@@ -31,8 +31,8 @@ func To(obj interface{}) (string, error) {
 }
 
 // Convert To String By Default Value
-func ToDef(obj interface{}, def string) string {
-	res, err := To(obj)
+func FromByDef(obj interface{}, def string) string {
+	res, err := From(obj)
 	if err != nil {
 		return def
 	}

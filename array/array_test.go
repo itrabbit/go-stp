@@ -15,7 +15,7 @@ func TestArray_Len(t *testing.T) {
 
 func TestArray_At(t *testing.T) {
 	arr := New(1, 2, 3, 4, 5)
-	item, err := arr.At(2)
+	item, err := arr.Get(2)
 	if err != nil {
 		t.Error(err)
 	}
@@ -104,7 +104,7 @@ func TestArray_Shift(t *testing.T) {
 
 func TestArray_Insert(t *testing.T) {
 	arr := New(1, 2, 3, 4, 5)
-	item, err := arr.Insert(2, 10).At(2)
+	item, err := arr.Insert(2, 10).Get(2)
 	if err != nil {
 		t.Error(err)
 	}
@@ -153,5 +153,13 @@ func TestArray_ForEachBack(t *testing.T) {
 	})
 	if result != "4 1;3 4;2 3;1 2;0 5;" {
 		t.Error("Invalid iterator each back")
+	}
+}
+
+func TestArray_ReOrder(t *testing.T) {
+	arr := New(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	result := fmt.Sprint(arr.ReOrder().Data())
+	if result != "[9 8 7 6 5 4 3 2 1]" {
+		t.Error("Invalid reorder operation")
 	}
 }

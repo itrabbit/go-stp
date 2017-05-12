@@ -44,7 +44,7 @@ func Type(bitSize int, unsigned bool) reflect.Type {
 }
 
 // Convert To Int
-func To(obj interface{}, bitSize int) (int64, error) {
+func From(obj interface{}, bitSize int) (int64, error) {
 	t := reflect.TypeOf(obj)
 	if t == Type(bitSize, false) {
 		return reflect.ValueOf(obj).Int(), nil
@@ -61,8 +61,8 @@ func To(obj interface{}, bitSize int) (int64, error) {
 }
 
 // Convert To Float By Default Value
-func ToDef(obj interface{}, bitSize int, def int64) int64 {
-	res, err := To(obj, bitSize)
+func FromByDef(obj interface{}, bitSize int, def int64) int64 {
+	res, err := From(obj, bitSize)
 	if err != nil {
 		return def
 	}
@@ -70,7 +70,7 @@ func ToDef(obj interface{}, bitSize int, def int64) int64 {
 }
 
 // Convert To Int Unsigned
-func ToUnsigned(obj interface{}, bitSize int) (uint64, error) {
+func UnsignedFrom(obj interface{}, bitSize int) (uint64, error) {
 	t := reflect.TypeOf(obj)
 	if t == Type(bitSize, true) {
 		return reflect.ValueOf(obj).Uint(), nil
@@ -87,8 +87,8 @@ func ToUnsigned(obj interface{}, bitSize int) (uint64, error) {
 }
 
 // Convert To Float By Default Value
-func ToUnsignedDef(obj interface{}, bitSize int, def uint64) uint64 {
-	res, err := ToUnsigned(obj, bitSize)
+func UnsignedFromByDef(obj interface{}, bitSize int, def uint64) uint64 {
+	res, err := UnsignedFrom(obj, bitSize)
 	if err != nil {
 		return def
 	}
