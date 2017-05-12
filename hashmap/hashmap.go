@@ -2,7 +2,9 @@ package hashmap
 
 import (
 	"errors"
+	"github.com/itrabbit/go-stp/array"
 	"github.com/itrabbit/go-stp/util"
+	"github.com/itrabbit/go-stp/util/less"
 	"reflect"
 )
 
@@ -29,12 +31,12 @@ type object struct {
 // Private class hashmap iterator
 type iterator struct {
 	m     *object
-	keys  []interface{}
+	keys  array.Interface
 	index int64
 }
 
 func (i *iterator) Next() bool {
-	if i.index+1 < int64(len(i.keys)) {
+	if i.index+1 < i.keys.Length() {
 		i.index += 1
 		return true
 	}
@@ -42,7 +44,7 @@ func (i *iterator) Next() bool {
 }
 
 func (i *iterator) Prev() bool {
-	if i.index-1 >= 0 && len(i.keys) > 0 {
+	if i.index-1 >= 0 && i.keys.Length() > 0 {
 		i.index -= 1
 		return true
 	}
@@ -50,8 +52,8 @@ func (i *iterator) Prev() bool {
 }
 
 func (i *iterator) Key() interface{} {
-	if i.index >= 0 && i.index < int64(len(i.keys)) {
-		return i.keys[i.index]
+	if i.index >= 0 && i.index < i.keys.Length() {
+		return i.keys.GetByDef(i.index, nil)
 	}
 	return nil
 }
@@ -61,6 +63,18 @@ func (i *iterator) Data() interface{} {
 		return d
 	}
 	return nil
+}
+
+func (i *iterator) SortKeys(less less.Func) util.MapIterator {
+	i.keys.Sort(less)
+	return i
+}
+
+func (i *iterator) SortValues(less less.Func) util.MapIterator {
+	i.keys.Sort(func(a, b interface{}) bool {
+		return less(i.m.GetByDef(a, nil), i.m.GetByDef(b, nil))
+	})
+	return i
 }
 
 // Get keys
@@ -138,7 +152,7 @@ func (m *object) Clear() Interface {
 func (m *object) Begin() util.MapIterator {
 	return &iterator{
 		m:     m,
-		keys:  m.Keys(),
+		keys:  array.New(m.Keys()...),
 		index: 0,
 	}
 }
@@ -148,7 +162,7 @@ func (m *object) End() util.MapIterator {
 	keys := m.Keys()
 	return &iterator{
 		m:     m,
-		keys:  keys,
+		keys:  array.New(keys...),
 		index: int64(len(keys) - 1),
 	}
 }

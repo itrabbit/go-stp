@@ -1,5 +1,7 @@
 package util
 
+import "github.com/itrabbit/go-stp/util/less"
+
 type Iterator interface {
 	Next() bool
 	Prev() bool
@@ -8,6 +10,8 @@ type Iterator interface {
 }
 
 type MapIterator interface {
+	SortKeys(less less.Func) MapIterator
+	SortValues(less less.Func) MapIterator
 	Next() bool
 	Prev() bool
 	Key() interface{}
