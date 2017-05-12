@@ -2,10 +2,44 @@ package array
 
 import (
 	"errors"
+	"github.com/itrabbit/go-stp/util"
 )
 
 type Object struct {
 	data []interface{}
+}
+
+type Iterator struct {
+	a     *Object
+	index int64
+}
+
+func (i *Iterator) Next() bool {
+	if i.index+1 < i.a.Length() {
+		i.index += 1
+		return true
+	}
+	return false
+}
+
+func (i *Iterator) Prev() bool {
+	if i.index-1 >= 0 {
+		i.index -= 1
+		return true
+	}
+	return false
+}
+
+func (i *Iterator) Index() int64 {
+	return i.index
+}
+
+func (i *Iterator) Data() interface{} {
+	d, err := i.a.At(i.index)
+	if err != nil {
+		return nil
+	}
+	return d
 }
 
 // Set value
@@ -119,6 +153,24 @@ func (a *Object) Clear() *Object {
 	a.data = a.data[len(a.data):]
 	a.data = nil
 	return a
+}
+
+func (a *Object) Begin() util.Iterator {
+	return &Iterator{
+		a:     a,
+		index: 0,
+	}
+}
+
+func (a *Object) End() util.Iterator {
+	index := a.Length() - 1
+	if index < 0 {
+		index = 0
+	}
+	return &Iterator{
+		a:     a,
+		index: index,
+	}
 }
 
 // Less function

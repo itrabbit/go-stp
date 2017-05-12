@@ -2,6 +2,7 @@ package array
 
 import (
 	"fmt"
+	"github.com/itrabbit/go-stp/util"
 	"testing"
 )
 
@@ -128,5 +129,29 @@ func TestArray_Sort(t *testing.T) {
 		return a.(int) > b.(int)
 	}).Data()) != "[5 4 3 2 1]" {
 		t.Error("Invalid sort")
+	}
+}
+
+func TestArray_ForEachNext(t *testing.T) {
+	result := ""
+	arr := New(5, 2, 3, 4, 1)
+	util.Each(arr.Begin(), func(index int64, data interface{}) (stop bool) {
+		result += fmt.Sprint(index, data, ";")
+		return
+	})
+	if result != "0 5;1 2;2 3;3 4;4 1;" {
+		t.Error("Invalid iterator each next")
+	}
+}
+
+func TestArray_ForEachBack(t *testing.T) {
+	result := ""
+	arr := New(5, 2, 3, 4, 1)
+	util.EachBack(arr.End(), func(index int64, data interface{}) (stop bool) {
+		result += fmt.Sprint(index, data, ";")
+		return
+	})
+	if result != "4 1;3 4;2 3;1 2;0 5;" {
+		t.Error("Invalid iterator each back")
 	}
 }
