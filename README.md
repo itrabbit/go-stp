@@ -6,9 +6,9 @@
 
 * Массивы + паттерн Iterator
 * Очереди FIFO
-* HashMap
-* Механизм преобразования данных
+* HashMap + паттерн Iterator (с сортировкой по ключам или значениям)
+* Механизм преобразования данных (с возможностью замены стандартных методов int <-> float32 и т.д.)
 
-# License
+# Лицензия / License
 
 This package is open-sourced software licensed under the [LICENSE](./LICENSE).
