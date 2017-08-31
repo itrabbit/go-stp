@@ -1,7 +1,9 @@
 package less
 
 import (
-	"reflect"
+	"github.com/itrabbit/go-stp/conversion/float"
+	"github.com/itrabbit/go-stp/conversion/integer"
+	s "github.com/itrabbit/go-stp/conversion/string"
 	"strings"
 )
 
@@ -11,32 +13,32 @@ type Func func(a, b interface{}) bool
 func IntFunc(asc bool) Func {
 	if asc {
 		return func(a, b interface{}) bool {
-			return reflect.ValueOf(a).Int() < reflect.ValueOf(b).Int()
+			return integer.FromByDef(a, 64, 0) < integer.FromByDef(b, 64, 0)
 		}
 	}
 	return func(a, b interface{}) bool {
-		return reflect.ValueOf(a).Int() > reflect.ValueOf(b).Int()
+		return integer.FromByDef(a, 64, 0) > integer.FromByDef(b, 64, 0)
 	}
 }
 
 func FloatFunc(asc bool) Func {
 	if asc {
 		return func(a, b interface{}) bool {
-			return reflect.ValueOf(a).Float() < reflect.ValueOf(b).Float()
+			return float.FromByDef(a, 64, 0) < float.FromByDef(b, 64, 0)
 		}
 	}
 	return func(a, b interface{}) bool {
-		return reflect.ValueOf(a).Float() > reflect.ValueOf(b).Float()
+		return float.FromByDef(a, 64, 0) > float.FromByDef(b, 64, 0)
 	}
 }
 
 func StringFunc(asc bool) Func {
 	if asc {
 		return func(a, b interface{}) bool {
-			return strings.Compare(a.(string), b.(string)) < 0
+			return strings.Compare(s.FromByDef(a, ""), s.FromByDef(b, "")) < 0
 		}
 	}
 	return func(a, b interface{}) bool {
-		return strings.Compare(a.(string), b.(string)) > 0
+		return strings.Compare(s.FromByDef(a, ""), s.FromByDef(b, "")) > 0
 	}
 }
